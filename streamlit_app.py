@@ -167,7 +167,7 @@ with st.sidebar:
 
     st.markdown("---")
     st.caption("Data: ESPN • Sleeper")
-    if st.button("🔄 Force refresh", use_container_width=True):
+    if st.button("🔄 Force refresh", width='stretch'):
         st.cache_data.clear()
         st.rerun()
     st.caption(f"Last loaded: {datetime.now().strftime('%I:%M:%S %p')}")
@@ -302,7 +302,7 @@ def _render_game_detail(summary_data: dict, team_abbr: str):
                 rows = [(s.get("label") or s.get("name"), s.get("displayValue")) for s in stats if s.get("label") or s.get("name")]
                 if rows:
                     df = pd.DataFrame(rows, columns=["Stat", "Value"])
-                    st.dataframe(df, use_container_width=True, hide_index=True)
+                    st.dataframe(df, width='stretch', hide_index=True)
 
     # Leaders (most leagues)
     leaders = summary_data.get("leaders") or header.get("competitions", [{}])[0].get("leaders") or []
@@ -479,7 +479,7 @@ def page_schedule():
                 "TV": ", ".join(g.get("broadcasts") or []),
             })
         df = pd.DataFrame(rows)
-        st.dataframe(df, use_container_width=True, hide_index=True)
+        st.dataframe(df, width='stretch', hide_index=True)
 
 
 def page_standings():
@@ -509,7 +509,7 @@ def page_standings():
             })
         df = pd.DataFrame(rows)
         df = df.dropna(axis=1, how="all")
-        st.dataframe(df, use_container_width=True, hide_index=True)
+        st.dataframe(df, width='stretch', hide_index=True)
 
 
 def page_injuries():
@@ -578,7 +578,7 @@ def page_roster():
         })
     df = pd.DataFrame(rows)
     df = df.dropna(axis=1, how="all")
-    st.dataframe(df, use_container_width=True, hide_index=True)
+    st.dataframe(df, width='stretch', hide_index=True)
 
     # Player deep-dive
     st.markdown("##### Player deep-dive")
@@ -600,7 +600,7 @@ def page_roster():
         st.caption(f"Last {len(logs)} games — {pick}")
         log_df = pd.DataFrame(logs)
         log_df = log_df.dropna(axis=1, how="all")
-        st.dataframe(log_df, use_container_width=True, hide_index=True)
+        st.dataframe(log_df, width='stretch', hide_index=True)
 
 
 def page_stats():
@@ -639,7 +639,7 @@ def page_news():
             cols = st.columns([1, 5])
             with cols[0]:
                 if n.get("image"):
-                    st.image(n["image"], use_container_width=True)
+                    st.image(n["image"], width='stretch')
             with cols[1]:
                 st.markdown(f"**[{n['headline']}]({url})**")
                 if n.get("description"):
@@ -654,7 +654,7 @@ def page_news():
             cols = st.columns([1, 5])
             with cols[0]:
                 if n.get("image"):
-                    st.image(n["image"], use_container_width=True)
+                    st.image(n["image"], width='stretch')
             with cols[1]:
                 st.markdown(f"**[{n['headline']}]({url})**")
                 if n.get("description"):
@@ -715,7 +715,7 @@ def page_fantasy():
         rows.sort(key=lambda x: (-x["W"], x["L"], -x["PF"]))
         df = pd.DataFrame(rows)
         st.markdown("##### Standings")
-        st.dataframe(df, use_container_width=True, hide_index=True)
+        st.dataframe(df, width='stretch', hide_index=True)
     else:
         st.info("Enter your Sleeper username to link your leagues. "
                 "Don't have one? Sleeper is free — [sleeper.com](https://sleeper.com).")
