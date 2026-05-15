@@ -1,66 +1,104 @@
 # bpleone Sports Hub
 
-Personal sports dashboard for Brandon's teams. Live at **sports.bpleone.com**.
+Personal team dashboard for Brandon's teams. Lakers, Dodgers, Rams, USC FB/BB/Baseball. Live scores, schedule, injuries, news, fantasy. Pure consumption, no trading.
 
-Tracks:
-- 🏀 Los Angeles Lakers (NBA)
-- ⚾ Los Angeles Dodgers (MLB)
-- 🏈 Los Angeles Rams (NFL)
-- 🏈 USC Trojans Football (NCAAF)
-- 🏀 USC Trojans Basketball (NCAAM)
-- ⚾ USC Trojans Baseball (CBB)
+**Live at** [bpleone.com/sports/](https://bpleone.com/sports/) and [keyvaniath.github.io/bpleone-sports-hub/](https://keyvaniath.github.io/bpleone-sports-hub/) (fallback)
 
-## Views
-- **Overview** — every team at a glance: last game, next game, today's status
-- **Today** — your team's game today + around the league + latest news + weather for outdoor home games
-- **Schedule** — full season, upcoming, past with W/L outcomes, in-game box-score expander
-- **Standings** — division and conference standings, your team highlighted
-- **Stats** — team season stats by category (offense/defense/general) with league ranks
-- **Injuries** — current injury report, severity-coded with return dates
-- **Roster** — full roster with position filter + player gamelog deep-dive
-- **News** — team + league feeds with thumbnails
-- **Fantasy** — Sleeper integration (enter username, browse leagues, standings)
+## Teams (6)
+
+| Team | Sport | League |
+|---|---|---|
+| 🏀 Los Angeles Lakers | Basketball | NBA |
+| ⚾ Los Angeles Dodgers | Baseball | MLB |
+| 🏈 Los Angeles Rams | Football | NFL |
+| 🏈 USC Trojans Football | Football | NCAAF (Big Ten) |
+| 🏀 USC Trojans Basketball | Basketball | NCAAM |
+| ⚾ USC Trojans Baseball | Baseball | CBB (Big Ten) |
+
+## Static landing pages (no auth, no installs, works in any browser)
+
+| URL | What |
+|---|---|
+| [/sports/](https://bpleone.com/sports/) | All-teams overview with live ESPN snapshot |
+| [/sports/live/](https://bpleone.com/sports/live/) | **Live games right now** — 20s auto-refresh when in-progress |
+| [/sports/lakers/](https://bpleone.com/sports/lakers/) | Lakers deep dive: record + last/next/schedule + news |
+| [/sports/dodgers/](https://bpleone.com/sports/dodgers/) | Dodgers deep dive |
+| [/sports/rams/](https://bpleone.com/sports/rams/) | Rams deep dive |
+| [/sports/usc-football/](https://bpleone.com/sports/usc-football/) | USC Football deep dive |
+| [/sports/usc-basketball/](https://bpleone.com/sports/usc-basketball/) | USC Basketball deep dive |
+| [/sports/usc-baseball/](https://bpleone.com/sports/usc-baseball/) | USC Baseball deep dive |
+
+Every page fetches live from ESPN's CORS-open JSON, no API key needed.
+
+## Streamlit dashboard
+
+Beyond the static landings, the Streamlit app provides 9 views per team:
+
+| View | What |
+|---|---|
+| 🏠 Today | Record, last game, next game, scoreboard, news |
+| 📅 Schedule | Upcoming + past with W/L outcomes, weather for outdoor home games |
+| 📊 Standings | Division/conf, your team highlighted |
+| 📈 Stats | Team season stats by category (offense/defense/general) |
+| 🩹 Injuries | Severity-coded with return dates |
+| 👥 Roster | Position filter + player gamelog deep-dive |
+| 📰 News | Team + league feeds with thumbnails |
+| 🎮 Fantasy | Sleeper integration (NFL + NBA leagues) |
+| 🏟️ All Teams | Cross-team glance with auto-refresh on live games |
 
 ## Data sources
-- **ESPN unofficial JSON** (`site.api.espn.com`, `cdn.espn.com`, `site.web.api.espn.com`) — scores, schedules, standings, news, injuries, rosters, team stats, player gamelogs, box scores
-- **Sleeper API** (`api.sleeper.app`) — fantasy leagues
-- **Open-Meteo** (`api.open-meteo.com`) — weather forecasts for outdoor home games (no auth required)
 
-No API keys required.
+- **ESPN unofficial JSON** (`site.api.espn.com`, `cdn.espn.com`, `site.web.api.espn.com`) — scores, schedules, standings, news, injuries, rosters, team stats, player gamelogs, box scores. CORS open.
+- **Sleeper API** (`api.sleeper.app`) — fantasy league lookup by username.
+- **Open-Meteo** (`api.open-meteo.com`) — free weather forecasts for outdoor home games.
+
+**No API keys required.** Everything runs on free tiers.
 
 ## Local dev
+
 ```
 pip install -r requirements.txt
 streamlit run streamlit_app.py
 ```
 
 ## Deploy
+
 ```
-python DEPLOY.py    # pushes to Keyvaniath/bpleone-sports-hub
+python DEPLOY.py
 ```
 
-Streamlit Community Cloud auto-rebuilds within ~60 seconds. Custom domain `sports.bpleone.com` is configured via CNAME.
+Pushes to `Keyvaniath/bpleone-sports-hub`. Connect to Streamlit Cloud for the dashboard; static landings serve from GitHub Pages.
 
 ## Files
-- `streamlit_app.py` — main dashboard, page routing, all UI
-- `data_sources.py` — ESPN API wrapper with TTL cache; covers team summary, schedule, scoreboard, roster, injuries, news, standings, team stats, player gamelog, box score
-- `fantasy_sleeper.py` — Sleeper API wrapper (user lookup, leagues, rosters, matchups)
-- `weather.py` — Open-Meteo wrapper for stadium-coord weather forecasts
-- `teams_config.py` — team IDs and metadata (single source of truth)
-- `requirements.txt` — `streamlit`, `pandas`, `requests`, `streamlit-autorefresh`
-- `DEPLOY.py` / `DEPLOY.bat` — one-click push to `Keyvaniath/bpleone-sports-hub`
 
-## Architecture notes
-- Live games auto-refresh every 30 seconds via `streamlit-autorefresh`
-- All ESPN calls have a TTL cache (30s for scoreboards, 5-15m for static data)
-- Streamlit's `@st.cache_data` adds a second layer for cross-session sharing
-- Force-refresh button in the sidebar clears all caches
+```
+streamlit_app.py     ─ 9-view Streamlit dashboard per team + all-teams overview
+data_sources.py      ─ ESPN API wrapper with TTL cache
+fantasy_sleeper.py   ─ Sleeper API wrapper
+teams_config.py      ─ team IDs + metadata (single source of truth)
+weather.py           ─ Open-Meteo forecasts for outdoor home games
+requirements.txt     ─ streamlit, pandas, requests, streamlit-autorefresh
+DEPLOY.py / .bat     ─ one-click push to repo
+docs/                ─ static GH Pages content
+  index.html            main landing with live snapshot
+  live/index.html       live-games-only page
+  lakers/index.html     per-team deep dive
+  dodgers/...
+  rams/...
+  usc-football/...
+  usc-basketball/...
+  usc-baseball/...
+  team-template.html    template for per-team pages
+```
 
 ## Roadmap
-- [x] Player gamelog deep-dive in Roster view
-- [x] Weather forecast for outdoor home games (Dodgers, Rams, USC FB/BB)
-- [x] USC baseball — ESPN id 68, full season schedule
-- [ ] Push notification webhook on close-game scoring (Discord)
-- [ ] Historic head-to-head splits
-- [ ] Schedule heat-map (busy weeks / off-nights)
+
+- [ ] Streamlit Community Cloud deploy at sports.bpleone.com (needs DNS CNAME at Squarespace)
+- [ ] Push notifications when Lakers/Dodgers/Rams score
+- [ ] Schedule heatmap (busy weeks / off-nights)
 - [ ] Compare two teams side-by-side
+- [ ] Historic head-to-head splits
+
+## Disclaimer
+
+Pure consumption. No trading, no betting, no edge claims. Just personal Sunday afternoon team-tracking.
