@@ -4,7 +4,37 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="bpleone Sports Hub — personal team dashboard. Lakers, Dodgers, Rams, USC. Live scores, schedule, injuries, news, fantasy. Pure consumption, no trading.">
+<meta name="keywords" content="Lakers, Dodgers, Rams, USC, sports dashboard, ESPN, fantasy, Sleeper, live scores, injury report">
+<meta name="author" content="Brandon P. Leone">
+<meta property="og:title" content="Sports Hub · bpleone.com">
+<meta property="og:description" content="6 teams in one dashboard — Lakers, Dodgers, Rams, USC FB/BB/Baseball. Live scores, schedules, injuries, news, Sleeper fantasy. Pure consumption, no trading.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://bpleone.com/sports/">
+<meta property="og:site_name" content="bpleone.com">
+<meta property="og:image" content="https://bpleone.com/og.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://bpleone.com/og.svg">
+<meta name="twitter:title" content="Sports Hub · bpleone.com">
+<meta name="twitter:description" content="Lakers, Dodgers, Rams, USC. One dashboard. ESPN data + Sleeper fantasy + weather. No API keys.">
+<link rel="canonical" href="https://bpleone.com/sports/">
 <title>Sports Hub — bpleone.com</title>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Sports Hub",
+  "url": "https://bpleone.com/sports/",
+  "description": "Personal team dashboard tracking Lakers, Dodgers, Rams, USC. Live ESPN scores, schedules, injuries, fantasy.",
+  "author": {"@type": "Person", "name": "Brandon P. Leone", "url": "https://bpleone.com"},
+  "isPartOf": {"@type": "WebSite", "name": "bpleone.com", "url": "https://bpleone.com"},
+  "about": [
+    {"@type": "SportsTeam", "name": "Los Angeles Lakers"},
+    {"@type": "SportsTeam", "name": "Los Angeles Dodgers"},
+    {"@type": "SportsTeam", "name": "Los Angeles Rams"},
+    {"@type": "SportsTeam", "name": "USC Trojans"}
+  ]
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -147,6 +177,30 @@
   }
   .btn-ghost:hover { color: var(--gold); border-color: var(--gold); }
 
+  .snap-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+    margin: 20px 0;
+  }
+  .snap-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .snap-card .head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .snap-card .emoji { font-size: 26px; }
+  .snap-card .meta { color: var(--text-dim); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .snap-card .name { font-weight: 700; font-size: 16px; }
+  .snap-card .record { color: var(--gold); font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 13px; }
+  .snap-card .row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px dashed var(--border); }
+  .snap-card .row:last-child { border-bottom: none; }
+  .snap-card .row .lbl { color: var(--text-dim); }
+  .snap-card .row .val { color: var(--text); font-weight: 600; }
+  .snap-card .row .val.win { color: var(--green); }
+  .snap-card .row .val.loss { color: #f87171; }
+
   footer {
     border-top: 1px solid var(--border);
     padding: 32px 0;
@@ -175,41 +229,98 @@
     <p class="lede">Live scores, schedule, injury reports, standings, team stats, player gamelog deep-dive, news aggregation, Sleeper fantasy integration. Auto-refresh every 30 seconds during live games. ESPN unofficial JSON + Sleeper public API. No API keys required.</p>
 
     <div class="teams-grid">
-      <div class="team-card">
+      <a href="/sports/lakers/" class="team-card" style="text-decoration:none; color:inherit; transition: transform 0.15s, border-color 0.15s;">
         <div class="emoji">🏀</div>
         <div class="name">Lakers</div>
         <div class="league">NBA · LeBron · Luka</div>
-      </div>
-      <div class="team-card">
+      </a>
+      <a href="/sports/dodgers/" class="team-card" style="text-decoration:none; color:inherit;">
         <div class="emoji">⚾</div>
         <div class="name">Dodgers</div>
         <div class="league">MLB · Ohtani · Mookie · Freeman</div>
-      </div>
-      <div class="team-card">
+      </a>
+      <a href="/sports/rams/" class="team-card" style="text-decoration:none; color:inherit;">
         <div class="emoji">🏈</div>
         <div class="name">Rams</div>
         <div class="league">NFL · Stafford · Kupp</div>
-      </div>
-      <div class="team-card">
+      </a>
+      <a href="/sports/usc-football/" class="team-card" style="text-decoration:none; color:inherit;">
         <div class="emoji">🏈</div>
         <div class="name">USC Football</div>
         <div class="league">NCAAF · Trojans</div>
-      </div>
-      <div class="team-card">
+      </a>
+      <a href="/sports/usc-basketball/" class="team-card" style="text-decoration:none; color:inherit;">
         <div class="emoji">🏀</div>
         <div class="name">USC Basketball</div>
         <div class="league">NCAAM · Trojans</div>
-      </div>
-      <div class="team-card">
+      </a>
+      <a href="/sports/usc-baseball/" class="team-card" style="text-decoration:none; color:inherit;">
         <div class="emoji">⚾</div>
         <div class="name">USC Baseball</div>
         <div class="league">CBB · Trojans</div>
-      </div>
+      </a>
     </div>
   </div>
 </section>
 
 <div class="container">
+
+  <section class="block">
+    <h2>Today's snapshot <span id="live-indicator" style="display:inline-block; width:8px; height:8px; background:#4ade80; border-radius:50%; margin-left:8px; animation:pulse 2s infinite;"></span></h2>
+    <p style="color:var(--text-dim); margin-bottom:8px; font-size:14px;">Pulled live from ESPN via your browser. Each card shows current record + last game outcome + next game. Refreshes every 5 minutes.</p>
+    <style>@keyframes pulse { 0%, 100% { opacity: 1 } 50% { opacity: 0.4 } }</style>
+    <div class="snap-grid" id="snap-grid">
+      <div class="snap-card">
+        <div class="head"><span class="emoji">🏀</span>
+          <div><div class="name">Lakers</div><div class="meta">NBA</div></div>
+          <div class="record" style="margin-left:auto">53-29</div>
+        </div>
+        <div class="row"><span class="lbl">Last</span><span class="val loss">L 110-115 vs OKC</span></div>
+        <div class="row"><span class="lbl">Status</span><span class="val">Playoffs</span></div>
+      </div>
+      <div class="snap-card">
+        <div class="head"><span class="emoji">⚾</span>
+          <div><div class="name">Dodgers</div><div class="meta">MLB</div></div>
+          <div class="record" style="margin-left:auto">26-18</div>
+        </div>
+        <div class="row"><span class="lbl">Last</span><span class="val win">W 5-2 vs SF</span></div>
+        <div class="row"><span class="lbl">Next</span><span class="val">@ LAA · May 16</span></div>
+      </div>
+      <div class="snap-card">
+        <div class="head"><span class="emoji">🏈</span>
+          <div><div class="name">Rams</div><div class="meta">NFL</div></div>
+          <div class="record" style="margin-left:auto">2nd NFC West</div>
+        </div>
+        <div class="row"><span class="lbl">Next</span><span class="val">vs SF · Sep 11</span></div>
+        <div class="row"><span class="lbl">Status</span><span class="val">Offseason</span></div>
+      </div>
+      <div class="snap-card">
+        <div class="head"><span class="emoji">🏈</span>
+          <div><div class="name">USC Football</div><div class="meta">NCAAF · Big Ten</div></div>
+          <div class="record" style="margin-left:auto">4th Big Ten</div>
+        </div>
+        <div class="row"><span class="lbl">Status</span><span class="val">Offseason</span></div>
+        <div class="row"><span class="lbl">Next opener</span><span class="val">Aug 23</span></div>
+      </div>
+      <div class="snap-card">
+        <div class="head"><span class="emoji">🏀</span>
+          <div><div class="name">USC Basketball</div><div class="meta">NCAAM</div></div>
+          <div class="record" style="margin-left:auto">18-14</div>
+        </div>
+        <div class="row"><span class="lbl">Last</span><span class="val loss">L 79-83 vs WASH</span></div>
+        <div class="row"><span class="lbl">Status</span><span class="val">Offseason</span></div>
+      </div>
+      <div class="snap-card">
+        <div class="head"><span class="emoji">⚾</span>
+          <div><div class="name">USC Baseball</div><div class="meta">CBB · Big Ten</div></div>
+          <div class="record" style="margin-left:auto">42-12</div>
+        </div>
+        <div class="row"><span class="lbl">Last</span><span class="val win">W 2-1 @ ORE</span></div>
+        <div class="row"><span class="lbl">Next</span><span class="val">@ ORE · May 16</span></div>
+      </div>
+    </div>
+    <p style="color:var(--text-dim); margin-top:14px; font-size:12px; font-style:italic;">Snapshot taken 2026-05-14. Inside the dashboard, this refreshes every 30 seconds during live games.</p>
+  </section>
 
   <div class="cta-row">
     <div class="pitch">
@@ -304,6 +415,27 @@
     </div>
   </div>
 
+  <section class="block">
+    <h2>Other desks</h2>
+    <div class="features-grid">
+      <a class="feature" href="/sports-cards/" rel="noopener" style="text-decoration:none; color:inherit; display:block;">
+        <div class="icon">🏀</div>
+        <h3>Sports Cards</h3>
+        <p>PSA-graded NBA/NFL/MLB watchlist. 98 cards, 36 parallels, 17 sealed boxes, composite quant scoring.</p>
+      </a>
+      <a class="feature" href="https://pokemon.bpleone.com" target="_blank" rel="noopener" style="text-decoration:none; color:inherit; display:block;">
+        <div class="icon">🃏</div>
+        <h3>Pokémon TCG</h3>
+        <p>20,000+ cards searchable, 774 quant-scored, live TCGPlayer prices, 5 budget brackets.</p>
+      </a>
+      <a class="feature" href="https://betting.bpleone.com" target="_blank" rel="noopener" style="text-decoration:none; color:inherit; display:block;">
+        <div class="icon">🎲</div>
+        <h3>Sports Betting / DFS</h3>
+        <p>Lines, models, ML lab, parlays, DFS lineups. Bankroll discipline built in.</p>
+      </a>
+    </div>
+  </section>
+
 </div>
 
 <footer>
@@ -313,5 +445,104 @@
   </div>
 </footer>
 
+<script>
+// Live ESPN data fetcher — pulls real records + last/next game for each team
+// and overwrites the static snapshot. Refreshes every 5 minutes.
+(function() {
+  const TEAMS = [
+    {key:"lakers", short:"Lakers",      meta:"NBA",                 emoji:"🏀", sport:"basketball", league:"nba",                      espn_id:"13", abbr:"LAL"},
+    {key:"dodgers", short:"Dodgers",    meta:"MLB",                 emoji:"⚾", sport:"baseball",  league:"mlb",                      espn_id:"19", abbr:"LAD"},
+    {key:"rams", short:"Rams",          meta:"NFL",                 emoji:"🏈", sport:"football",  league:"nfl",                      espn_id:"14", abbr:"LAR"},
+    {key:"usc_fb", short:"USC Football",meta:"NCAAF · Big Ten",     emoji:"🏈", sport:"football",  league:"college-football",         espn_id:"30", abbr:"USC"},
+    {key:"usc_mbb",short:"USC Basketball",meta:"NCAAM",             emoji:"🏀", sport:"basketball",league:"mens-college-basketball",  espn_id:"30", abbr:"USC"},
+    {key:"usc_bb", short:"USC Baseball",meta:"CBB · Big Ten",       emoji:"⚾", sport:"baseball",  league:"college-baseball",         espn_id:"68", abbr:"USC"},
+  ];
+
+  async function fetchTeam(t) {
+    const base = `https://site.api.espn.com/apis/site/v2/sports/${t.sport}/${t.league}/teams/${t.espn_id}`;
+    try {
+      const [sumRes, schedRes] = await Promise.all([fetch(base), fetch(`${base}/schedule`)]);
+      const sum = await sumRes.json();
+      const sched = await schedRes.json();
+      const team = sum.team || {};
+      const recItems = (team.record || {}).items || [];
+      const record = recItems[0]?.summary || team.standingSummary || "—";
+      const events = (sched.events || []).map(e => {
+        const comp = (e.competitions || [{}])[0];
+        const comps = comp.competitors || [];
+        const home = comps.find(c => c.homeAway === "home");
+        const away = comps.find(c => c.homeAway === "away");
+        const status = (comp.status || {}).type || {};
+        const date = new Date(e.date);
+        const isHome = (home?.team?.abbreviation || "").toUpperCase() === t.abbr.toUpperCase();
+        return { date, name: e.shortName || e.name, state: status.state, completed: status.completed, isHome,
+                 home, away, myAbbr: t.abbr.toUpperCase() };
+      }).sort((a,b)=>a.date-b.date);
+      const now = new Date();
+      const past = events.filter(e => e.completed || e.date < new Date(now.getTime() - 6*3600*1000)).reverse();
+      const upcoming = events.filter(e => !e.completed && e.date >= new Date(now.getTime() - 6*3600*1000));
+      return { team: t, record, last: past[0], next: upcoming[0] };
+    } catch (e) {
+      return { team: t, record: "—", error: e.message };
+    }
+  }
+
+  function outcomeFor(g) {
+    if (!g) return "";
+    const me = g.isHome ? g.home : g.away;
+    const opp = g.isHome ? g.away : g.home;
+    const myS = parseInt(me?.score?.displayValue || me?.score || 0);
+    const oppS = parseInt(opp?.score?.displayValue || opp?.score || 0);
+    if (g.completed) {
+      const wl = myS > oppS ? "W" : myS < oppS ? "L" : "T";
+      return { txt: `${wl} ${myS}-${oppS} ${g.isHome ? 'vs' : '@'} ${opp?.team?.abbreviation || ''}`, cls: wl === "W" ? "win" : (wl === "L" ? "loss" : "") };
+    }
+    if (g.state === "in") return { txt: `LIVE ${myS}-${oppS}`, cls: "" };
+    return { txt: g.name, cls: "" };
+  }
+
+  function nextLabel(g) {
+    if (!g) return "";
+    const opp = g.isHome ? g.away : g.home;
+    const label = (g.isHome ? "vs " : "@ ") + (opp?.team?.abbreviation || "?");
+    const d = g.date;
+    const dateStr = d.toLocaleDateString("en-US", {month: "short", day: "numeric"});
+    return `${label} · ${dateStr}`;
+  }
+
+  function renderCards(snapshots) {
+    const grid = document.getElementById("snap-grid");
+    if (!grid) return;
+    grid.innerHTML = snapshots.map(s => {
+      const t = s.team;
+      const last = s.last ? outcomeFor(s.last) : null;
+      const next = s.next ? nextLabel(s.next) : null;
+      let status = "";
+      if (!last && !next) status = "Offseason";
+      const rows = [];
+      if (last) rows.push(`<div class="row"><span class="lbl">Last</span><span class="val ${last.cls}">${last.txt}</span></div>`);
+      if (next) rows.push(`<div class="row"><span class="lbl">Next</span><span class="val">${next}</span></div>`);
+      if (!last && !next) rows.push(`<div class="row"><span class="lbl">Status</span><span class="val">Offseason</span></div>`);
+      return `<div class="snap-card">
+        <div class="head"><span class="emoji">${t.emoji}</span>
+          <div><div class="name">${t.short}</div><div class="meta">${t.meta}</div></div>
+          <div class="record" style="margin-left:auto">${s.record}</div>
+        </div>
+        ${rows.join("")}
+      </div>`;
+    }).join("");
+  }
+
+  async function refresh() {
+    try {
+      const results = await Promise.all(TEAMS.map(fetchTeam));
+      renderCards(results);
+    } catch (e) { /* keep static fallback */ }
+  }
+
+  refresh();
+  setInterval(refresh, 5 * 60 * 1000);
+})();
+</script>
 </body>
 </html>
