@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="bpleone Sports Hub — personal team dashboard. Lakers, Dodgers, Rams, USC. Live scores, schedule, injuries, news, fantasy. Pure consumption, no trading.">
+<title>Sports Hub — bpleone.com</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg-card: #131826;
+    --border: #232a3e;
+    --gold: #f5c842;
+    --gold-dim: #c9a73c;
+    --text: #e8ecf4;
+    --text-dim: #8b94a8;
+    --green: #4ade80;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(245,200,66,0.05) 0, transparent 40%),
+      radial-gradient(circle at 80% 60%, rgba(74,222,128,0.03) 0, transparent 40%);
+    background-attachment: fixed;
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  nav {
+    border-bottom: 1px solid var(--border);
+    padding: 18px 0;
+    position: sticky;
+    top: 0;
+    background: rgba(10,14,26,0.85);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+  nav .container { display: flex; align-items: center; justify-content: space-between; }
+  .nav-brand { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 16px; }
+  .nav-brand .dot { color: var(--gold); }
+  .nav-back { color: var(--text-dim); text-decoration: none; font-size: 14px; }
+  .nav-back:hover { color: var(--gold); }
+
+  .hero { padding: 80px 0 40px; }
+  .hero-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    margin-bottom: 18px;
+  }
+  .hero h1 .accent { color: var(--gold); }
+  .hero p.lede {
+    color: var(--text-dim);
+    font-size: 17px;
+    max-width: 640px;
+    margin-bottom: 32px;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(74,222,128,0.12);
+    border: 1px solid rgba(74,222,128,0.35);
+    color: var(--green);
+    padding: 4px 10px; border-radius: 6px;
+    font-size: 11px; font-family: 'JetBrains Mono', monospace;
+    font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .teams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+  .team-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+    text-align: center;
+  }
+  .team-card .emoji { font-size: 36px; margin-bottom: 8px; }
+  .team-card .name { font-weight: 700; font-size: 16px; }
+  .team-card .league { color: var(--text-dim); font-size: 12px; margin-top: 4px; }
+
+  section.block { margin-bottom: 48px; }
+  section.block h2 {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 18px;
+  }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .feature {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+  }
+  .feature .icon { font-size: 22px; margin-bottom: 8px; }
+  .feature h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .feature p { color: var(--text-dim); font-size: 14px; line-height: 1.5; }
+
+  .cta-row {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    padding: 32px;
+    background: var(--bg-card);
+    border: 1px solid var(--gold);
+    border-radius: 16px;
+    margin-bottom: 48px;
+  }
+  .cta-row .pitch { flex: 1; min-width: 280px; }
+  .cta-row h3 { font-size: 20px; margin-bottom: 8px; }
+  .cta-row p { color: var(--text-dim); font-size: 14px; }
+  .cta-row .actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .btn-gold {
+    background: var(--gold); color: var(--bg);
+    padding: 12px 22px; border-radius: 8px; font-weight: 700;
+    text-decoration: none; font-size: 14px;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-gold:hover { background: var(--gold-dim); }
+  .btn-ghost {
+    color: var(--text-dim); padding: 12px 22px;
+    border: 1px solid var(--border); border-radius: 8px;
+    font-weight: 500; text-decoration: none; font-size: 14px;
+  }
+  .btn-ghost:hover { color: var(--gold); border-color: var(--gold); }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 0;
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+  footer .container { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  footer a { color: var(--text-dim); text-decoration: none; }
+  footer a:hover { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <div class="nav-brand">bpleone<span class="dot">.</span>com / sports-hub</div>
+    <a href="https://bpleone.com" class="nav-back">← all desks</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <div class="badge">● Live</div>
+    <div class="hero-eyebrow">Personal team dashboard · pure consumption, no trading</div>
+    <h1>Every team I follow, <span class="accent">one dashboard</span>.</h1>
+    <p class="lede">Live scores, schedule, injury reports, standings, team stats, player gamelog deep-dive, news aggregation, Sleeper fantasy integration. Auto-refresh every 30 seconds during live games. ESPN unofficial JSON + Sleeper public API. No API keys required.</p>
+
+    <div class="teams-grid">
+      <div class="team-card">
+        <div class="emoji">🏀</div>
+        <div class="name">Lakers</div>
+        <div class="league">NBA · LeBron · Luka</div>
+      </div>
+      <div class="team-card">
+        <div class="emoji">⚾</div>
+        <div class="name">Dodgers</div>
+        <div class="league">MLB · Ohtani · Mookie · Freeman</div>
+      </div>
+      <div class="team-card">
+        <div class="emoji">🏈</div>
+        <div class="name">Rams</div>
+        <div class="league">NFL · Stafford · Kupp</div>
+      </div>
+      <div class="team-card">
+        <div class="emoji">🏈</div>
+        <div class="name">USC Football</div>
+        <div class="league">NCAAF · Trojans</div>
+      </div>
+      <div class="team-card">
+        <div class="emoji">🏀</div>
+        <div class="name">USC Basketball</div>
+        <div class="league">NCAAM · Trojans</div>
+      </div>
+      <div class="team-card">
+        <div class="emoji">⚾</div>
+        <div class="name">USC Baseball</div>
+        <div class="league">CBB · Trojans</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+
+  <div class="cta-row">
+    <div class="pitch">
+      <h3>The full Streamlit dashboard</h3>
+      <p>9 views per team — Overview, Today, Schedule, Standings, Stats, Injuries, Roster (with player gamelog), News, Fantasy — plus an all-teams cross-team overview at a glance.</p>
+    </div>
+    <div class="actions">
+      <a class="btn-gold" href="https://github.com/Keyvaniath/bpleone-sports-hub" target="_blank" rel="noopener">View source →</a>
+      <a class="btn-ghost" href="https://share.streamlit.io" target="_blank" rel="noopener">Streamlit Cloud</a>
+    </div>
+  </div>
+
+  <section class="block">
+    <h2>What you see per team</h2>
+    <div class="features-grid">
+      <div class="feature">
+        <div class="icon">🏠</div>
+        <h3>Today</h3>
+        <p>Record, last game outcome, next game, games played, today's game card, around-the-league scoreboard, latest news.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">📅</div>
+        <h3>Schedule</h3>
+        <p>Full season schedule with upcoming/past tabs, W/L outcomes, broadcast networks, weather forecast for outdoor home games.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">📊</div>
+        <h3>Standings</h3>
+        <p>Division and conference standings with your team highlighted. Win %, streak, home/road splits.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">📈</div>
+        <h3>Stats</h3>
+        <p>Team season stats grouped by category (general / offense / defense) with league ranks.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🩹</div>
+        <h3>Injuries</h3>
+        <p>Current injury report, severity-coded (Out → Doubtful → Questionable → Probable) with return-date estimates.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">👥</div>
+        <h3>Roster + Gamelog</h3>
+        <p>Full roster with position filter. Click any player to see their last 20-game log with stat breakdown.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">📰</div>
+        <h3>News</h3>
+        <p>Team-specific articles with thumbnails + league-wide feed. Updated every 5 minutes.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🎮</div>
+        <h3>Fantasy</h3>
+        <p>Sleeper integration — enter your username, browse all your NFL/NBA leagues, see standings and matchups.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🏟️</div>
+        <h3>All Teams Overview</h3>
+        <p>Cross-team glance — last game, next game, live status for every team in one row. Auto-refreshes when any game is live.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>Data sources</h2>
+    <div class="features-grid">
+      <div class="feature">
+        <div class="icon">📡</div>
+        <h3>ESPN unofficial JSON</h3>
+        <p>site.api.espn.com, cdn.espn.com, site.web.api.espn.com — scores, schedules, standings, news, injuries, rosters, team stats, player gamelogs, box scores. No auth.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🎮</div>
+        <h3>Sleeper API</h3>
+        <p>api.sleeper.app — fantasy league lookup by username. No OAuth required for public league data.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">☁️</div>
+        <h3>Open-Meteo</h3>
+        <p>Free weather forecasts for outdoor home games — Dodger Stadium, Coliseum, Dedeaux Field. Temperature, wind, precipitation chance per game.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="cta-row">
+    <div class="pitch">
+      <h3>Run it yourself</h3>
+      <p>Clone the repo, <code>pip install -r requirements.txt</code>, <code>streamlit run streamlit_app.py</code>. No API keys needed.</p>
+    </div>
+    <div class="actions">
+      <a class="btn-gold" href="https://github.com/Keyvaniath/bpleone-sports-hub" target="_blank" rel="noopener">GitHub →</a>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="container">
+    <span>© 2026 Brandon P. Leone</span>
+    <span><a href="https://bpleone.com">bpleone.com</a> · <a href="https://github.com/Keyvaniath/bpleone-sports-hub">GitHub</a></span>
+  </div>
+</footer>
+
+</body>
+</html>
