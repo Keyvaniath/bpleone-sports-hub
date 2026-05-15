@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Live games right now from Lakers, Dodgers, Rams, USC. Auto-refreshes every 20 seconds.">
+<title>Live Games — bpleone.com Sports Hub</title>
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg-card: #131826;
+    --border: #232a3e;
+    --gold: #f5c842;
+    --text: #e8ecf4;
+    --text-dim: #8b94a8;
+    --red: #f87171;
+    --green: #4ade80;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+  nav { font-family: 'JetBrains Mono', monospace; font-size: 14px; margin-bottom: 24px; }
+  nav a { color: var(--text-dim); text-decoration: none; margin-right: 18px; }
+  nav a:hover { color: var(--gold); }
+  nav a.brand { color: var(--text); font-weight: 700; }
+  nav a.brand .dot { color: var(--gold); }
+
+  h1 { font-size: 36px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 6px; }
+  h1 .live-dot {
+    display: inline-block; width: 14px; height: 14px;
+    background: var(--red); border-radius: 50%;
+    margin-right: 10px;
+    animation: pulse 1.5s infinite;
+    vertical-align: middle;
+  }
+  @keyframes pulse { 0%, 100% { opacity: 1 } 50% { opacity: 0.4 } }
+  .sub { color: var(--text-dim); font-size: 14px; margin-bottom: 28px; }
+
+  .game {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 6px solid var(--red);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 0 0 1px rgba(248,113,113,0.15);
+  }
+  .game.upcoming { border-left-color: var(--gold); }
+  .game.final { border-left-color: var(--text-dim); }
+  .game.win { border-left-color: var(--green); }
+  .game .matchup { font-weight: 700; font-size: 20px; }
+  .game .score {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+    font-size: 36px;
+    color: var(--gold);
+    margin-top: 8px;
+  }
+  .game .status {
+    color: var(--red);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    margin-top: 4px;
+  }
+  .game .status.upcoming { color: var(--gold); }
+  .game .status.final { color: var(--text-dim); }
+  .game .meta { color: var(--text-dim); font-size: 12px; margin-top: 6px; }
+
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
+  }
+  .empty .icon { font-size: 64px; margin-bottom: 16px; }
+
+  footer { color: var(--text-dim); font-size: 12px; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
+  footer a { color: var(--text-dim); }
+  footer a:hover { color: var(--gold); }
+</style>
+</head>
+<body>
+<div class="container">
+  <nav>
+    <a class="brand" href="/">bpleone<span class="dot">.</span>com</a>
+    <a href="/sports/">← Sports Hub</a>
+  </nav>
+
+  <h1><span class="live-dot"></span>Live Right Now</h1>
+  <p class="sub">All currently-active games across Brandon's teams. Refreshes every 20 seconds while a game is in progress.</p>
+
+  <div id="games"><div class="empty"><div class="icon">⏸️</div><p>Loading...</p></div></div>
+
+  <footer>
+    Data: ESPN unofficial JSON · <a href="/sports/">all teams</a> · <a href="https://github.com/Keyvaniath/bpleone-sports-hub" target="_blank">source</a>
+  </footer>
+</div>
+
+<script>
+const TEAMS = [
+  {key:"lakers",  short:"Lakers",         emoji:"🏀", sport:"basketball", league:"nba",                     id:"13", abbr:"LAL"},
+  {key:"dodgers", short:"Dodgers",        emoji:"⚾", sport:"baseball",   league:"mlb",                     id:"19", abbr:"LAD"},
+  {key:"rams",    short:"Rams",           emoji:"🏈", sport:"football",   league:"nfl",                     id:"14", abbr:"LAR"},
+  {key:"usc_fb",  short:"USC Football",   emoji:"🏈", sport:"football",   league:"college-football",        id:"30", abbr:"USC"},
+  {key:"usc_mbb", short:"USC Basketball", emoji:"🏀", sport:"basketball", league:"mens-college-basketball", id:"30", abbr:"USC"},
+  {key:"usc_bb",  short:"USC Baseball",   emoji:"⚾", sport:"baseball",   league:"college-baseball",        id:"68", abbr:"USC"},
+];
+
+let liveCount = 0;
+let pollInterval = 5 * 60 * 1000; // 5 min default
+
+async function fetchTeamToday(t) {
+  try {
+    const r = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${t.sport}/${t.league}/teams/${t.id}/schedule`);
+    const data = await r.json();
+    const events = (data.events || []);
+    const today = new Date();
+    const todayStart = new Date(today); todayStart.setHours(0,0,0,0);
+    const todayEnd = new Date(todayStart); todayEnd.setDate(todayEnd.getDate() + 1);
+    const todayEvents = events.filter(e => {
+      const d = new Date(e.date);
+      return d >= todayStart && d < todayEnd;
+    });
+    return todayEvents.map(e => ({...e, _team: t}));
+  } catch (e) {
+    return [];
+  }
+}
+
+function renderGame(evt) {
+  const t = evt._team;
+  const comp = (evt.competitions || [{}])[0];
+  const comps = comp.competitors || [];
+  const home = comps.find(c => c.homeAway === "home");
+  const away = comps.find(c => c.homeAway === "away");
+  const status = (comp.status || {}).type || {};
+  const isLive = status.state === "in";
+  const isFinal = status.completed;
+
+  const myAbbr = t.abbr.toUpperCase();
+  const isHome = (home?.team?.abbreviation || "").toUpperCase() === myAbbr;
+  const me = isHome ? home : away;
+  const opp = isHome ? away : home;
+  const myScore = parseInt(me?.score?.displayValue || me?.score || 0);
+  const oppScore = parseInt(opp?.score?.displayValue || opp?.score || 0);
+
+  let cls = "upcoming";
+  let statusTxt = new Date(evt.date).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  let scoreLine = `${away?.team?.abbreviation || '?'} @ ${home?.team?.abbreviation || '?'}`;
+
+  if (isLive) {
+    cls = "";
+    liveCount++;
+    statusTxt = `LIVE · ${comp.status.displayClock || ''} ${status.shortDetail || ''}`.trim();
+    scoreLine = `${away?.team?.abbreviation} ${parseInt(away?.score?.displayValue || away?.score || 0)} — ${home?.team?.abbreviation} ${parseInt(home?.score?.displayValue || home?.score || 0)}`;
+  } else if (isFinal) {
+    cls = myScore > oppScore ? "win" : "final";
+    statusTxt = `FINAL · ${myScore > oppScore ? 'W' : (myScore < oppScore ? 'L' : 'T')}`;
+    scoreLine = `${away?.team?.abbreviation} ${parseInt(away?.score?.displayValue || away?.score || 0)} — ${home?.team?.abbreviation} ${parseInt(home?.score?.displayValue || home?.score || 0)}`;
+  }
+
+  const venue = comp.venue?.fullName || '';
+  const network = (comp.broadcasts || [])[0]?.names?.join(', ') || '';
+  const meta = [venue, network && '📺 ' + network].filter(Boolean).join(' · ');
+
+  return `<a href="/sports/${t.key.replace('_','-')}/" class="game ${cls}" style="text-decoration:none; color:inherit; display:block;">
+    <div class="status ${cls === 'upcoming' ? 'upcoming' : (cls === 'final' ? 'final' : '')}">${t.emoji} ${t.short} · ${statusTxt}</div>
+    <div class="matchup">${evt.name || evt.shortName || ''}</div>
+    <div class="score">${scoreLine}</div>
+    ${meta ? `<div class="meta">${meta}</div>` : ''}
+  </a>`;
+}
+
+async function refresh() {
+  liveCount = 0;
+  const allResults = await Promise.all(TEAMS.map(fetchTeamToday));
+  const allEvents = allResults.flat();
+
+  if (!allEvents.length) {
+    document.getElementById("games").innerHTML = `<div class="empty">
+      <div class="icon">⏸️</div>
+      <p>No games today for any tracked team.</p>
+      <p style="margin-top:12px;"><a href="/sports/" style="color:var(--gold)">View upcoming schedule →</a></p>
+    </div>`;
+    pollInterval = 5 * 60 * 1000;
+    return;
+  }
+
+  // Sort: LIVE first, then upcoming (by time), then final
+  allEvents.sort((a, b) => {
+    const aStatus = ((a.competitions || [{}])[0]?.status?.type || {});
+    const bStatus = ((b.competitions || [{}])[0]?.status?.type || {});
+    const aLive = aStatus.state === "in" ? 0 : (aStatus.completed ? 2 : 1);
+    const bLive = bStatus.state === "in" ? 0 : (bStatus.completed ? 2 : 1);
+    if (aLive !== bLive) return aLive - bLive;
+    return new Date(a.date) - new Date(b.date);
+  });
+
+  document.getElementById("games").innerHTML = allEvents.map(renderGame).join("");
+
+  // Faster refresh if anything is live
+  pollInterval = liveCount > 0 ? 20 * 1000 : 5 * 60 * 1000;
+}
+
+refresh();
+function loop() { refresh().then(() => setTimeout(loop, pollInterval)); }
+setTimeout(loop, 5 * 60 * 1000);
+</script>
+</body>
+</html>
