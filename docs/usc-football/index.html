@@ -1,0 +1,292 @@
+<!--
+Per-team template — populated client-side from ESPN's CORS-friendly JSON.
+Replace TEAM_DATA with one of:
+  { key: "lakers", short: "Lakers", emoji: "🏀", sport: "basketball", league: "nba", id: "13", abbr: "LAL", color: "#552583" }
+  { key: "dodgers", short: "Dodgers", emoji: "⚾", sport: "baseball", league: "mlb", id: "19", abbr: "LAD", color: "#005A9C" }
+  { key: "rams", short: "Rams", emoji: "🏈", sport: "football", league: "nfl", id: "14", abbr: "LAR", color: "#003594" }
+  { key: "usc_fb", short: "USC Football", emoji: "🏈", sport: "football", league: "college-football", id: "30", abbr: "USC", color: "#990000" }
+  { key: "usc_mbb", short: "USC Basketball", emoji: "🏀", sport: "basketball", league: "mens-college-basketball", id: "30", abbr: "USC", color: "#990000" }
+  { key: "usc_bb", short: "USC Baseball", emoji: "⚾", sport: "baseball", league: "college-baseball", id: "68", abbr: "USC", color: "#990000" }
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="USC Football — live record, next game, last result, news. Part of bpleone.com Sports Hub.">
+<title>USC Football — bpleone.com Sports Hub</title>
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg-card: #131826;
+    --border: #232a3e;
+    --gold: #f5c842;
+    --text: #e8ecf4;
+    --text-dim: #8b94a8;
+    --green: #4ade80;
+    --red: #f87171;
+    --orange: #fb923c;
+    --team: #990000;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .container { max-width: 1000px; margin: 0 auto; }
+  nav { font-family: 'JetBrains Mono', monospace; font-size: 14px; margin-bottom: 24px; }
+  nav a { color: var(--text-dim); text-decoration: none; margin-right: 18px; }
+  nav a:hover { color: var(--gold); }
+  nav a.brand { color: var(--text); font-weight: 700; }
+  nav a.brand .dot { color: var(--gold); }
+
+  .hero {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 6px solid var(--team);
+    border-radius: 14px;
+    padding: 32px;
+    margin-bottom: 24px;
+  }
+  .hero .emoji { font-size: 72px; line-height: 1; margin-bottom: 8px; }
+  .hero h1 { font-size: 38px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 4px; }
+  .hero .meta { color: var(--text-dim); font-size: 14px; }
+  .hero .record {
+    margin-top: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+    color: var(--gold);
+    font-size: 32px;
+  }
+  .hero .standing { color: var(--text-dim); font-size: 13px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+  }
+  .panel h3 {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--gold);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .panel .big {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .panel .big.win  { color: var(--green); }
+  .panel .big.loss { color: var(--red); }
+  .panel .sub { color: var(--text-dim); font-size: 13px; }
+
+  .news-section { margin-bottom: 24px; }
+  .news-section h2 {
+    font-size: 20px;
+    margin-bottom: 14px;
+    letter-spacing: -0.02em;
+  }
+  .news-item {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .news-item a { color: var(--text); text-decoration: none; font-weight: 500; }
+  .news-item a:hover { color: var(--gold); }
+  .news-item .byline { color: var(--text-dim); font-size: 11px; margin-top: 4px; }
+
+  .schedule { margin-bottom: 24px; }
+  .schedule-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .schedule-row .date { color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  .schedule-row .matchup { font-weight: 600; }
+  .schedule-row .result.win  { color: var(--green); font-family: 'JetBrains Mono', monospace; font-weight: 700; }
+  .schedule-row .result.loss { color: var(--red); font-family: 'JetBrains Mono', monospace; font-weight: 700; }
+  .schedule-row .result { font-family: 'JetBrains Mono', monospace; }
+
+  .loading { color: var(--text-dim); font-style: italic; padding: 20px; text-align: center; }
+
+  footer { color: var(--text-dim); font-size: 12px; margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--border); }
+  footer a { color: var(--text-dim); }
+  footer a:hover { color: var(--gold); }
+</style>
+</head>
+<body>
+<div class="container">
+  <nav>
+    <a class="brand" href="/">bpleone<span class="dot">.</span>com</a>
+    <a href="/sports/">← Sports Hub</a>
+  </nav>
+
+  <div class="hero">
+    <div class="emoji">🏈</div>
+    <h1 id="team-name">USC Football</h1>
+    <div class="meta" id="team-meta">NCAAF · Trojans · Big Ten</div>
+    <div class="record" id="team-record">—</div>
+    <div class="standing" id="team-standing"></div>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <h3>Last Game</h3>
+      <div class="big" id="last-result">—</div>
+      <div class="sub" id="last-meta"></div>
+    </div>
+    <div class="panel">
+      <h3>Next Game</h3>
+      <div class="big" id="next-result">—</div>
+      <div class="sub" id="next-meta"></div>
+    </div>
+    <div class="panel">
+      <h3>Today</h3>
+      <div class="big" id="today-status">—</div>
+      <div class="sub" id="today-meta"></div>
+    </div>
+  </div>
+
+  <section class="news-section">
+    <h2>Schedule</h2>
+    <div id="schedule"><div class="loading">Loading schedule...</div></div>
+  </section>
+
+  <section class="news-section">
+    <h2>Latest News</h2>
+    <div id="news"><div class="loading">Loading news...</div></div>
+  </section>
+
+  <footer>
+    Data: ESPN unofficial JSON · refreshes every 5 minutes ·
+    <a href="/sports/">all teams</a> · <a href="https://github.com/Keyvaniath/bpleone-sports-hub" target="_blank">source</a>
+  </footer>
+</div>
+
+<script>
+const TEAM = {"key": "usc-football", "short": "USC Football", "meta": "NCAAF \u00b7 Trojans \u00b7 Big Ten", "emoji": "\ud83c\udfc8", "sport": "football", "league": "college-football", "id": "30", "abbr": "USC", "color": "#990000"};
+const ESPN_BASE = `https://site.api.espn.com/apis/site/v2/sports/${TEAM.sport}/${TEAM.league}`;
+
+function outcomeFor(evt) {
+  const comp = (evt.competitions || [{}])[0];
+  const comps = comp.competitors || [];
+  const home = comps.find(c => c.homeAway === "home");
+  const away = comps.find(c => c.homeAway === "away");
+  if (!home || !away) return { txt: evt.shortName || evt.name, cls: "" };
+  const isHome = (home.team?.abbreviation || "").toUpperCase() === TEAM.abbr.toUpperCase();
+  const me = isHome ? home : away;
+  const opp = isHome ? away : home;
+  const myS = parseInt(me.score?.displayValue || me.score || 0);
+  const oppS = parseInt(opp.score?.displayValue || opp.score || 0);
+  const status = (comp.status || {}).type || {};
+  if (status.completed) {
+    const wl = myS > oppS ? "W" : (myS < oppS ? "L" : "T");
+    return { txt: `${wl} ${myS}-${oppS}`, sub: `${isHome ? 'vs' : '@'} ${opp.team?.abbreviation || ''}`, cls: wl === "W" ? "win" : (wl === "L" ? "loss" : "") };
+  }
+  if (status.state === "in") {
+    return { txt: `${myS}-${oppS}`, sub: `LIVE · ${isHome ? 'vs' : '@'} ${opp.team?.abbreviation || ''}`, cls: "" };
+  }
+  return { txt: `${isHome ? 'vs' : '@'} ${opp.team?.abbreviation || '?'}`, sub: new Date(evt.date).toLocaleString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }), cls: "" };
+}
+
+async function refresh() {
+  try {
+    const [sumRes, schedRes, newsRes] = await Promise.all([
+      fetch(`${ESPN_BASE}/teams/${TEAM.id}`),
+      fetch(`${ESPN_BASE}/teams/${TEAM.id}/schedule`),
+      fetch(`${ESPN_BASE}/news?team=${TEAM.id}&limit=10`),
+    ]);
+    const sum = await sumRes.json();
+    const sched = await schedRes.json();
+    const news = await newsRes.json();
+
+    const team = sum.team || {};
+    const recItems = (team.record || {}).items || [];
+    document.getElementById("team-record").textContent = recItems[0]?.summary || "—";
+    document.getElementById("team-standing").textContent = team.standingSummary || "";
+
+    const events = (sched.events || []);
+    const now = new Date();
+    const past = events.filter(e => {
+      const status = (e.competitions || [{}])[0]?.status?.type || {};
+      return status.completed || new Date(e.date) < new Date(now.getTime() - 6*3600*1000);
+    }).reverse();
+    const upcoming = events.filter(e => {
+      const status = (e.competitions || [{}])[0]?.status?.type || {};
+      return !status.completed && new Date(e.date) >= new Date(now.getTime() - 6*3600*1000);
+    });
+    const live = events.filter(e => ((e.competitions || [{}])[0]?.status?.type || {}).state === "in");
+
+    if (past[0]) {
+      const o = outcomeFor(past[0]);
+      document.getElementById("last-result").textContent = o.txt;
+      document.getElementById("last-result").className = "big " + o.cls;
+      document.getElementById("last-meta").textContent = (o.sub || "") + " · " + new Date(past[0].date).toLocaleDateString();
+    }
+    if (upcoming[0]) {
+      const o = outcomeFor(upcoming[0]);
+      document.getElementById("next-result").textContent = o.txt;
+      document.getElementById("next-meta").textContent = o.sub || "";
+    }
+    if (live[0]) {
+      const o = outcomeFor(live[0]);
+      document.getElementById("today-status").textContent = "LIVE " + o.txt;
+      document.getElementById("today-meta").textContent = o.sub || "";
+    } else if (upcoming[0]) {
+      const d = new Date(upcoming[0].date);
+      const today = new Date();
+      if (d.toDateString() === today.toDateString()) {
+        const o = outcomeFor(upcoming[0]);
+        document.getElementById("today-status").textContent = o.txt;
+        document.getElementById("today-meta").textContent = "Game day · " + d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+      } else {
+        document.getElementById("today-status").textContent = "No game today";
+        document.getElementById("today-meta").textContent = "";
+      }
+    }
+
+    // Schedule (next 8 + last 4)
+    const showEvents = past.slice(0, 4).reverse().concat(upcoming.slice(0, 8));
+    document.getElementById("schedule").innerHTML = showEvents.map(e => {
+      const o = outcomeFor(e);
+      return `<div class="schedule-row">
+        <span class="date">${new Date(e.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+        <span class="matchup">${e.shortName || e.name}</span>
+        <span class="result ${o.cls}">${o.txt}</span>
+      </div>`;
+    }).join("") || `<div class="loading">No events.</div>`;
+
+    // News
+    const articles = (news.articles || []).slice(0, 8);
+    document.getElementById("news").innerHTML = articles.map(a => {
+      const url = a.links?.web?.href || "#";
+      const pub = (a.published || "").slice(0, 10);
+      return `<div class="news-item">
+        <a href="${url}" target="_blank" rel="noopener">${a.headline}</a>
+        <div class="byline">${a.byline || a.type || ""} · ${pub}</div>
+      </div>`;
+    }).join("") || `<div class="loading">No articles right now.</div>`;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+refresh();
+setInterval(refresh, 5 * 60 * 1000);
+</script>
+</body>
+</html>
